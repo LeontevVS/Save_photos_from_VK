@@ -25,7 +25,7 @@ class VK:
         response = requests.post(url=url, params=params).json()
         return response
 
-    def _get_not_system_album_id(self, owner_id, title):
+    def _get_albums(self, owner_id):
         try:
             url = f"{self.base_url}photos.getAlbums"
             params = {
@@ -66,7 +66,7 @@ class VK:
                 return
             owner_id = user_info["response"][0]["id"]
             if album != 'profile' and album != 'wall':
-                album_info = self._get_not_system_album_id(owner_id, album)
+                album_info = self._get_albums(owner_id)
                 finded_album = list(filter(lambda x: x["title"] == album, album_info["items"]))
                 if len(finded_album) != 0:
                     album = finded_album[0]["id"]
@@ -77,6 +77,25 @@ class VK:
             return photos
         except:
             return
+
+    def get_user_albums(self, user_id):
+        try:
+            user_info = self.get_user_info(user_id)
+            if "error" in user_info.keys():
+                print("Ошибка авторизации")
+                return
+            if len(user_info["response"]) == 0:
+                print("Пользователь с данным id не найден")
+                return
+            owner_id = user_info["response"][0]["id"]
+            response = self._get_albums(owner_id)
+            items = response["items"]
+            albums = list()
+            for item in items:
+                albums.append({"title": item['title'], "photos_count": item["size"]})
+            return albums
+        except:
+            pass
 
     def _get_user_photos_request(self, owner_id, count, album_id):
         params = {

@@ -1,7 +1,7 @@
-from ComandHandler import ComandHandler
+from CommandHandler import CommandHandler
 
 if __name__ == "__main__":
-    handler = ComandHandler()
+    handler = CommandHandler()
     while True:
         print("Введите команду:")
         command = input()
